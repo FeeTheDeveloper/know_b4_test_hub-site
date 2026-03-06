@@ -22,6 +22,12 @@ export function AuthForm({ action, submitLabel, children }: AuthFormProps) {
         </div>
       )}
 
+      {state.message && (
+        <div className="p-3 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">
+          {state.message}
+        </div>
+      )}
+
       {children}
 
       <button

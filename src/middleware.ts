@@ -3,7 +3,14 @@ import { createSupabaseMiddlewareClient } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const { supabase, response } = createSupabaseMiddlewareClient(request);
+
+  let supabase, response;
+  try {
+    ({ supabase, response } = createSupabaseMiddlewareClient(request));
+  } catch {
+    // Supabase env vars not configured — allow the request through
+    return NextResponse.next();
+  }
 
   // Refresh session — this keeps the cookie alive
   const {

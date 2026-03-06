@@ -11,13 +11,17 @@ import type {
 /* ─── Public / user-facing queries ─────────────────────── */
 
 export async function getPublishedCourses(): Promise<Course[]> {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from("courses")
-    .select("*")
-    .eq("is_published", true)
-    .order("title");
-  return (data ?? []) as Course[];
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase
+      .from("courses")
+      .select("*")
+      .eq("is_published", true)
+      .order("title");
+    return (data ?? []) as Course[];
+  } catch {
+    return [];
+  }
 }
 
 export async function getCourseBySlug(slug: string): Promise<Course | null> {

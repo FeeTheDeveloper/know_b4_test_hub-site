@@ -3,6 +3,8 @@ import { getInitials } from "@/lib/utils";
 import { DashboardShellWrapper } from "@/components/layout/dashboard-shell-wrapper";
 import { userNavLinks } from "@/lib/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {

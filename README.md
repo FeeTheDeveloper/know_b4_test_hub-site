@@ -136,26 +136,45 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Deploying to Vercel
 
-1. Push this repo to GitHub
-2. Import the repo into [Vercel](https://vercel.com)
-3. Set environment variables from `.env.example` in Vercel project settings
-4. Deploy — no custom server or build configuration needed
+### Requirements
+
+- A [Vercel](https://vercel.com) account
+- A [Supabase](https://supabase.com) project (see _Connecting Supabase_ below)
+- This repo pushed to GitHub (or GitLab / Bitbucket)
+
+### Steps
+
+1. **Import the repo** — go to [vercel.com/new](https://vercel.com/new), select your Git provider, and import this repository.
+2. **Set environment variables** — in the Vercel project **Settings → Environment Variables**, add:
+
+   | Variable | Value | Notes |
+   | --- | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://<your-project>.supabase.co` | From Supabase dashboard → Settings → API |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ…` | From Supabase dashboard → Settings → API |
+   | `NEXT_PUBLIC_SITE_URL` | `https://your-domain.vercel.app` | Your Vercel production URL (used for auth email redirect links) |
+
+   > **Important:** `NEXT_PUBLIC_SITE_URL` must match your live domain exactly (including `https://`). Auth confirmation and password-reset emails will redirect to this URL.
+
+3. **Deploy** — click Deploy. No custom build commands or server configuration are needed; the default Next.js preset works out of the box.
+4. **Update Supabase redirect allow-list** — in Supabase dashboard → Authentication → URL Configuration, add your Vercel URL to the **Redirect URLs** list:
+
+   ```text
+   https://your-domain.vercel.app/auth/callback
+   ```
+
+5. **(Optional) Custom domain** — if you add a custom domain in Vercel, update `NEXT_PUBLIC_SITE_URL` and the Supabase redirect allow-list to match.
+
+### Redeployment
+
+Pushing to the `main` branch automatically triggers a new production deployment. Environment variables persist across deploys.
 
 ## Connecting Supabase
 
 1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Copy the project URL and anon key into `.env.local`
-3. Install the Supabase packages:
-
-   ```bash
-   npm install @supabase/supabase-js @supabase/ssr
-   ```
-
-4. Create database tables matching the types in `src/types/database.ts`
-5. Enable Supabase Auth (email/password provider)
-6. Uncomment the session check in `src/middleware.ts`
-7. Replace mock data imports with Supabase queries in page components
-8. Update `src/lib/auth.ts` to use real Supabase session data
+2. Copy the project URL and anon key into `.env.local` (see `.env.example` for the template)
+3. Run the schema in `supabase/schema.sql` against your database (Supabase dashboard → SQL Editor)
+4. Enable the **Email** auth provider in Authentication → Providers
+5. Add `http://localhost:3000/auth/callback` to Authentication → URL Configuration → Redirect URLs
 
 ## Implementation Roadmap
 

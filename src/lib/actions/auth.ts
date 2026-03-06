@@ -25,11 +25,17 @@ export async function signUp(formData: FormData): Promise<ActionResult> {
     password,
     options: {
       data: { first_name: firstName, last_name: lastName },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/auth/callback?next=/dashboard`,
     },
   });
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  // If the user already exists, Supabase returns a user with no identities
+  if (data.user?.identities?.length === 0) {
+    return { success: false, error: "An account with this email already exists. Please sign in instead." };
   }
 
   // Update the auto-created profile with name and company
@@ -38,6 +44,11 @@ export async function signUp(formData: FormData): Promise<ActionResult> {
       .from("profiles")
       .update({ first_name: firstName, last_name: lastName, company })
       .eq("user_id", data.user.id);
+  }
+
+  // If no session, email confirmation is required
+  if (!data.session) {
+    return { success: true, message: "Check your email for a confirmation link to complete your registration." };
   }
 
   redirect("/dashboard");
@@ -56,6 +67,9 @@ export async function signIn(formData: FormData): Promise<ActionResult> {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    if (error.message.toLowerCase().includes("email not confirmed")) {
+      return { success: false, error: "Please confirm your email address before signing in. Check your inbox for a confirmation link." };
+    }
     return { success: false, error: "Invalid email or password." };
   }
 
