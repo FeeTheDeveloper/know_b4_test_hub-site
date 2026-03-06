@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DashboardCard, CourseCard, PageHeading } from "@/components/ui";
 import { requireProfile } from "@/lib/auth";
 import { getUserEnrollments } from "@/lib/actions/enrollment";
@@ -80,9 +81,9 @@ export default async function DashboardPage() {
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <p className="text-gray-500 text-sm">No active courses yet.</p>
-          <a href="/dashboard/courses" className="inline-block mt-2 text-sm font-medium text-brandGold hover:text-brandGoldLight">
+          <Link href="/dashboard/courses" className="inline-block mt-2 text-sm font-medium text-brandGold hover:text-brandGoldLight">
             Browse available courses &rarr;
-          </a>
+          </Link>
         </div>
       )}
 
@@ -105,23 +106,23 @@ export default async function DashboardPage() {
                     {enrollment.courses.duration_hours}h total
                   </p>
                 </div>
-                <a
+                <Link
                   href={`/dashboard/courses/${enrollment.courses.slug}`}
                   className="text-xs font-semibold text-brandGold hover:text-brandGoldLight transition-colors"
                 >
                   Resume &rarr;
-                </a>
+                </Link>
               </div>
             ))
           ) : (
             <div className="px-5 py-8 text-center">
               <p className="text-sm text-gray-500">No upcoming training scheduled.</p>
-              <a
+              <Link
                 href="/dashboard/courses"
                 className="inline-block mt-2 text-sm font-medium text-brandGold hover:text-brandGoldLight"
               >
                 Browse courses &rarr;
-              </a>
+              </Link>
             </div>
           )}
         </div>
