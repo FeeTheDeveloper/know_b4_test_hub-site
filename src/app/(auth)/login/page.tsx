@@ -8,7 +8,13 @@ async function loginAction(_prev: ActionResult, formData: FormData): Promise<Act
   return signIn(formData);
 }
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{ error?: string }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { error: callbackError } = await searchParams;
+
   return (
     <div className="min-h-screen bg-brandBlue flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -27,6 +33,11 @@ export default function LoginPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-6 shadow-sm rounded-xl border border-gray-200">
+          {callbackError && (
+            <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+              {callbackError}
+            </div>
+          )}
           <AuthForm action={loginAction} submitLabel="Sign in">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">

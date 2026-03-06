@@ -12,7 +12,13 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(new URL(next, origin));
     }
+    console.error("Auth callback error:", error.message);
+    const loginUrl = new URL("/login", origin);
+    loginUrl.searchParams.set("error", "Your confirmation link is invalid or has expired. Please try again.");
+    return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.redirect(new URL("/login", origin));
+  const loginUrl = new URL("/login", origin);
+  loginUrl.searchParams.set("error", "No authentication code provided. Please try signing in again.");
+  return NextResponse.redirect(loginUrl);
 }

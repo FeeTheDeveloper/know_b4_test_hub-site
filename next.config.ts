@@ -13,10 +13,9 @@ const codespacesHosts = [
 ].filter((host): host is string => Boolean(host));
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: codespacesHosts,
   experimental: {
     serverActions: {
-      // Required when the app is accessed behind Codespaces/GitHub port forwarding
-      // where Origin and X-Forwarded-Host differ.
       allowedOrigins: ["localhost:3000", "127.0.0.1:3000", ...codespacesHosts],
     },
   },

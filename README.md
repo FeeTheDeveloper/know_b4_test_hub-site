@@ -145,7 +145,8 @@ Open [http://localhost:3000](http://localhost:3000).
 ### Steps
 
 1. **Import the repo** — go to [vercel.com/new](https://vercel.com/new), select your Git provider, and import this repository.
-2. **Set environment variables** — in the Vercel project **Settings → Environment Variables**, add:
+2. **Framework preset** — Vercel auto-detects **Next.js**. Accept the defaults — no custom build command, output directory, or install command is needed.
+3. **Set environment variables** — in the Vercel project **Settings → Environment Variables**, add the following for **all environments** (Production, Preview, Development):
 
    | Variable | Value | Notes |
    | --- | --- | --- |
@@ -153,20 +154,36 @@ Open [http://localhost:3000](http://localhost:3000).
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ…` | From Supabase dashboard → Settings → API |
    | `NEXT_PUBLIC_SITE_URL` | `https://your-domain.vercel.app` | Your Vercel production URL (used for auth email redirect links) |
 
-   > **Important:** `NEXT_PUBLIC_SITE_URL` must match your live domain exactly (including `https://`). Auth confirmation and password-reset emails will redirect to this URL.
+   > **Critical:** All three variables must be set **before the first deploy**. The middleware returns a `500 Internal Server Error` if Supabase env vars are missing, so the site will be broken without them.
 
-3. **Deploy** — click Deploy. No custom build commands or server configuration are needed; the default Next.js preset works out of the box.
-4. **Update Supabase redirect allow-list** — in Supabase dashboard → Authentication → URL Configuration, add your Vercel URL to the **Redirect URLs** list:
+   > **Important:** `NEXT_PUBLIC_SITE_URL` must match your live domain exactly (including `https://`). Auth confirmation and password-reset emails redirect to this URL.
+
+4. **Deploy** — click **Deploy**. The build runs `next build` with the default Next.js preset — no custom server or configuration is required.
+5. **Update Supabase redirect allow-list** — in Supabase dashboard → **Authentication → URL Configuration**, add your Vercel URL to the **Redirect URLs** list:
 
    ```text
    https://your-domain.vercel.app/auth/callback
    ```
 
-5. **(Optional) Custom domain** — if you add a custom domain in Vercel, update `NEXT_PUBLIC_SITE_URL` and the Supabase redirect allow-list to match.
+6. **Verify auth flow** — after deploying, test signup and login. Confirmation emails will link back to your Vercel URL via `/auth/callback`. If the link is expired or invalid, users are redirected to `/login` with a clear error message.
+
+7. **(Optional) Custom domain** — if you add a custom domain in Vercel, update **both**:
+   - `NEXT_PUBLIC_SITE_URL` env var in Vercel
+   - The redirect URL in Supabase Authentication → URL Configuration
 
 ### Redeployment
 
 Pushing to the `main` branch automatically triggers a new production deployment. Environment variables persist across deploys.
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| `500 Internal Server Error` on all pages | Supabase env vars missing | Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel → Settings → Environment Variables, then redeploy |
+| Auth confirmation link shows "invalid or expired" | Link clicked too late or already used | User should request a new signup / password-reset email |
+| Login redirects with "No authentication code" | Callback hit without a code param | Likely a stale bookmark — user should sign in again normally |
+| Auth emails point to `localhost` | `NEXT_PUBLIC_SITE_URL` not set or still `http://localhost:3000` | Set `NEXT_PUBLIC_SITE_URL` to your production URL and redeploy |
+| Preview deploys fail auth | Supabase redirect allow-list missing preview URL | Add `https://*-<your-team>.vercel.app/auth/callback` as a wildcard redirect in Supabase |
 
 ## Connecting Supabase
 

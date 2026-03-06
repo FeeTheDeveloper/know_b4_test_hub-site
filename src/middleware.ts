@@ -8,8 +8,8 @@ export async function middleware(request: NextRequest) {
   try {
     ({ supabase, response } = createSupabaseMiddlewareClient(request));
   } catch {
-    // Supabase env vars not configured — allow the request through
-    return NextResponse.next();
+    // Supabase env vars not configured — block access to protected routes
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 
   // Refresh session — this keeps the cookie alive
